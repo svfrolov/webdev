@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="ru" class="h-100">
+<head>
+  <meta charset="utf-8">
+  <title>{% block title %}{% endblock %}</title>
+  {% load static %}
+  <link rel="stylesheet" type="text/css" href="{% static 'css/examp.css' %}">
+</head>
+<body>
+    <header>
+        <h1>Агентство недвижимости</h1>
+        <nav>
+            <a href="/">Главная</a>
+        </nav>
+    </header>
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+    <footer>
+        <p>МГТУ им. Баумана, 2025</p>
+    </footer>
+</body>
+</html>
