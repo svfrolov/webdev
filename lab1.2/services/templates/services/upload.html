@@ -1,0 +1,21 @@
+{% extends 'services/base.html' %}
+
+{% block title %}Загрузка файлов в MinIO{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1>Загрузка файлов в MinIO</h1>
+    <div class="card">
+        <div class="card-body">
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <label for="file" class="form-label">Выберите файл для загрузки</label>
+                    <input type="file" name="file" id="file" class="form-control" required>
+                </div>
+                <button type="submit" class="btn btn-primary">Загрузить</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
