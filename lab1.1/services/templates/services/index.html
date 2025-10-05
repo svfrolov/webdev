@@ -1,0 +1,37 @@
+{% extends 'services/base.html' %}
+
+{% block title %}Главная страница{% endblock %}
+
+{% block content %}
+<h2>Добро пожаловать в агентство недвижимости!</h2>
+<p>Сегодня: {{ data.current_date }}</p>
+
+<h3>Мы используем:</h3>
+<ul>
+    {% for var in data.list %}
+        {% if var == 'python' %}
+            <li>Мы любим {{ var }}</li>
+        {% elif var == 'django' %}
+            <li>Мы очень любим {{ var }}!</li>
+        {% else %}
+            <li>Мы используем {{ var }}</li>
+        {% endif %}
+    {% endfor %}
+</ul>
+
+{% if data.input_text %}
+<div class="result-text">
+    <h3>Вы отправили:</h3>
+    <p>{{ data.input_text }}</p>
+</div>
+{% endif %}
+
+<h3>Отправить сообщение:</h3>
+<form action="sendText" method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    <input name="text" type="text" placeholder="Введите текст"><br><br>
+    <input type="submit" value="Submit" >
+</form>
+
+<p><a href="/">Перейти к списку заказов</a></p>
+{% endblock %}
