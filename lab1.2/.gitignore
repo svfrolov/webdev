@@ -1,27 +1,13 @@
-# Django
-*.log
-*.pot
-*.pyc
+# Файл со структурой проекта
+project_structure.md
+
+# Стандартные файлы Python
 __pycache__/
-local_settings.py
-db.sqlite3
-db.sqlite3-journal
-media
-
-# Environments
-.env
-.venv
-env/
-venv/
-ENV/
-env.bak/
-venv.bak/
-
-# Python
 *.py[cod]
 *$py.class
 *.so
 .Python
+env/
 build/
 develop-eggs/
 dist/
@@ -33,10 +19,21 @@ lib64/
 parts/
 sdist/
 var/
-wheels/
 *.egg-info/
 .installed.cfg
 *.egg
+
+# Django
+*.log
+local_settings.py
+db.sqlite3
+db.sqlite3-journal
+media/
+
+# Виртуальное окружение
+venv/
+ENV/
+env/
 
 # IDE
 .idea/
@@ -44,17 +41,9 @@ wheels/
 *.swp
 *.swo
 
-# Docker
-.docker/
+# OS
+.DS_Store
+Thumbs.db
 
-# Project specific files
-start_project.txt
-Лабораторные работы 1, 2, 3, 4.txt
-project_structure.txt
-
-# Backup files
-*~
-*.bak
-
-# Logs
-logs/
+# Файлы Docker
+.dockerignore
