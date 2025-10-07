@@ -1,0 +1,199 @@
+/* Основные цвета, скопированные с сайта ЦИАН */
+:root {
+    --primary-color: #0468ff; /* Основной синий цвет */
+    --secondary-color: #ff4e00; /* Акцентный оранжевый цвет */
+    --light-gray: #f2f2f2; /* Светло-серый фон */
+    --text-color: #333333; /* Основной цвет текста */
+    --border-radius: 8px; /* Радиус скругления углов */
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: var(--text-color);
+    background-color: #ffffff;
+}
+
+/* Стили для навигационной панели */
+.navbar-dark.bg-primary {
+    background-color: var(--primary-color) !important;
+}
+
+/* Стили для карточек объектов недвижимости */
+.property-card {
+    border-radius: var(--border-radius);
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    margin-bottom: 20px;
+    border: none;
+    height: 100%; /* Гарантируем, что все карточки одинаковой высоты */
+}
+
+.property-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
+}
+
+.property-card .card-img-top {
+    height: 200px;
+    object-fit: cover;
+}
+
+.property-card .card-title {
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: var(--text-color);
+}
+
+.property-address {
+    font-size: 0.9rem;
+    color: #666;
+    margin-bottom: 12px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.property-features {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 12px;
+    font-size: 0.9rem;
+    color: #666;
+}
+
+.property-features span {
+    display: flex;
+    align-items: center;
+}
+
+.property-features i {
+    margin-right: 4px;
+}
+
+.property-price {
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--primary-color);
+    margin-bottom: 0;
+}
+
+/* Стили для бейджей типа недвижимости */
+.badge-property-type {
+    background-color: var(--secondary-color);
+    color: white;
+    font-weight: 500;
+    padding: 5px 10px;
+    border-radius: 4px;
+}
+
+/* Стили для карточки заявки */
+.order-card {
+    border-radius: var(--border-radius);
+    border: 2px solid var(--primary-color);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Стили для кнопок */
+.btn-primary {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+.btn-primary:hover {
+    background-color: #0354cc;
+    border-color: #0354cc;
+}
+
+.btn-outline-primary {
+    color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+.btn-outline-primary:hover {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+/* Стили для хлебных крошек */
+.breadcrumb {
+    background-color: transparent;
+    padding: 0;
+}
+
+.breadcrumb-item a {
+    color: var(--primary-color);
+    text-decoration: none;
+}
+
+.breadcrumb-item.active {
+    color: #666;
+}
+
+/* Стили для футера */
+footer {
+    background-color: var(--light-gray) !important;
+}
+
+/* Стили для форм */
+.form-control:focus, .form-select:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 0.25rem rgba(4, 104, 255, 0.25);
+}
+
+/* Стили для таблицы в заявке */
+.table-striped tbody tr:nth-of-type(odd) {
+    background-color: rgba(4, 104, 255, 0.05);
+}
+
+.table-primary {
+    background-color: rgba(4, 104, 255, 0.1);
+}
+
+/* Оптимизация контейнера для лучшего отображения карточек */
+@media (min-width: 992px) {
+    .container {
+        max-width: 1200px; /* Увеличиваем максимальную ширину контейнера */
+    }
+}
+
+/* Адаптивные стили */
+@media (max-width: 768px) {
+    .property-card .card-img-top {
+        height: 150px;
+    }
+    
+    .property-features {
+        flex-direction: column;
+        gap: 5px;
+    }
+}
+
+/* Улучшение отображения карточек в сетке */
+.row-cols-1 > * {
+    flex: 0 0 auto;
+    width: 100%;
+}
+
+@media (min-width: 576px) {
+    .row-cols-sm-2 > * {
+        flex: 0 0 auto;
+        width: 50%;
+    }
+}
+
+@media (min-width: 768px) {
+    .row-cols-md-3 > * {
+        flex: 0 0 auto;
+        width: 33.333333%;
+    }
+}
+
+@media (min-width: 992px) {
+    .row-cols-lg-3 > * {
+        flex: 0 0 auto;
+        width: 33.333333%;
+    }
+}

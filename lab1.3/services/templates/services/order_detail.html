@@ -1,0 +1,166 @@
+{% extends 'services/base.html' %}
+
+{% block title %}Заявка #{{ order.id }}{% endblock %}
+
+{% block content %}
+<div class="container">
+    <nav aria-label="breadcrumb" class="my-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'services:real-estate-list-page' %}">Каталог недвижимости</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Заявка #{{ order.id }}</li>
+        </ol>
+    </nav>
+
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card mb-4">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h4 class="mb-0">Заявка #{{ order.id }}</h4>
+                    <span class="badge {% if order.status == 'draft' %}bg-warning{% elif order.status == 'formed' %}bg-info{% elif order.status == 'completed' %}bg-success{% elif order.status == 'rejected' %}bg-danger{% else %}bg-secondary{% endif %}">
+                        {{ order.status_display }}
+                    </span>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-4">
+                        <div class="col-md-6 mb-3">
+                            <h5>ФИО клиента</h5>
+                            <p>{{ order.client_name|default:"Не указано" }}</p>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <h5>Телефон клиента</h5>
+                            <p>{{ order.client_phone|default:"Не указано" }}</p>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <h5>Email клиента</h5>
+                            <p>{{ order.client_email|default:"Не указано" }}</p>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <h5>Способ оплаты</h5>
+                            <p>{{ order.payment_method_display|default:"Не указано" }}</p>
+                        </div>
+                    </div>
+                    
+                    <h4 class="mb-3">Объекты недвижимости в заявке</h4>
+                    
+                    {% if order_properties %}
+                    <div class="table-responsive mb-4">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>№</th>
+                                    <th>Объект</th>
+                                    <th>Цена</th>
+                                    <th>Количество</th>
+                                    <th>Итого</th>
+                                    <th>Действия</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in order_properties %}
+                                <tr>
+                                    <td>{{ item.order_number }}</td>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <div class="flex-shrink-0">
+                                                {% if item.real_estate.image_url %}
+                                                <img src="{{ item.real_estate.image_url }}" alt="{{ item.real_estate.name }}" class="img-thumbnail" style="width: 80px; height: 60px; object-fit: cover;">
+                                                {% else %}
+                                                <img src="https://via.placeholder.com/80x60?text=Нет+изображения" alt="Нет изображения" class="img-thumbnail">
+                                                {% endif %}
+                                            </div>
+                                            <div class="ms-3">
+                                                <h6 class="mb-0">{{ item.real_estate.name }}</h6>
+                                                <small class="text-muted">{{ item.real_estate.address }}</small>
+                                                {% if item.is_main %}
+                                                <span class="badge bg-primary ms-2">Основной</span>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>{{ item.real_estate.price|floatformat:0 }} ₽</td>
+                                    <td>{{ item.quantity }}</td>
+                                    <td>{{ item.final_price|floatformat:0 }} ₽</td>
+                                    <td>
+                                        <!-- Скрытая форма для отправки POST-запроса удаления -->
+                                        <form id="remove-form-{{ item.id }}" method="post" action="{% url 'services:remove-property-from-order' order.id item.id %}" style="display: none;">
+                                            {% csrf_token %}
+                                        </form>
+                                        
+                                        <!-- Ссылка "Удалить" с JavaScript для отправки формы -->
+                                        <a href="javascript:void(0);" onclick="document.getElementById('remove-form-{{ item.id }}').submit();">
+                                            <i class="bi bi-trash"></i> Удалить
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                            <tfoot>
+                                <tr class="table-primary">
+                                    <th colspan="4" class="text-end">Общая стоимость:</th>
+                                    <th>{{ total_price|floatformat:0 }} ₽</th>
+                                    <th></th>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                    
+                    {% else %}
+                    <div class="alert alert-info">
+                        <h5 class="alert-heading">Корзина пуста</h5>
+                        <p>В вашей корзине пока нет объектов недвижимости. Перейдите в <a href="{% url 'services:real-estate-list-page' %}">каталог недвижимости</a>, чтобы добавить объекты.</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card sticky-top" style="top: 20px;">
+                <div class="card-header">
+                    <h5 class="mb-0">Информация о заявке</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <h6>Статус заявки</h6>
+                        <p>{{ order.status_display }}</p>
+                    </div>
+                    <div class="mb-3">
+                        <h6>Дата создания</h6>
+                        <p>{{ order.created_at }}</p>
+                    </div>
+                    {% if order.formed_at %}
+                    <div class="mb-3">
+                        <h6>Дата формирования</h6>
+                        <p>{{ order.formed_at }}</p>
+                    </div>
+                    {% endif %}
+                    {% if order.completed_at %}
+                    <div class="mb-3">
+                        <h6>Дата завершения</h6>
+                        <p>{{ order.completed_at }}</p>
+                    </div>
+                    {% endif %}
+                    <div class="mb-3">
+                        <h6>Создатель</h6>
+                        <p>{{ order.creator.username }}</p>
+                    </div>
+                    {% if order.moderator %}
+                    <div class="mb-3">
+                        <h6>Модератор</h6>
+                        <p>{{ order.moderator.username }}</p>
+                    </div>
+                    {% endif %}
+                    <div class="mb-3">
+                        <h6>Количество объектов</h6>
+                        <p>{{ order.items|length }}</p>
+                    </div>
+                    <div class="mb-3">
+                        <h6>Итоговая стоимость</h6>
+                        <p class="fs-4 fw-bold text-primary">{{ total_price|floatformat:0 }} ₽</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,90 @@
+{% extends 'services/base.html' %}
+
+{% block title %}Каталог недвижимости{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1 class="my-4">Каталог недвижимости</h1>
+    
+    <div class="row mb-4">
+        <div class="col-12">
+            <form method="get" action="{% url 'services:real-estate-list-page' %}" class="mb-4">
+                <div class="input-group">
+                    <input type="text" name="search" class="form-control" placeholder="Поиск по названию" value="{{ search_query }}">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-search"></i> Найти
+                    </button>
+                </div>
+            </form>
+        </div>
+        
+        {% if draft_order %}
+        <div class="col-md-4 mb-4">
+            <div class="card order-card">
+                <div class="card-body">
+                    <h5 class="mb-0">Ваша корзина (Заявка #{{ draft_order.id }})</h5>
+                    <p class="text-muted mb-0">Количество объектов: {{ draft_order.items|length }}</p>
+                    <a href="{% url 'services:order-detail-page' draft_order.id %}">
+                        <i class="bi bi-cart"></i> Перейти в корзину
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+    
+    {% if real_estates %}
+    <div class="row">
+        {% for property in real_estates %}
+        <div class="col-md-4 mb-4">
+            <div class="card property-card h-100">
+                {% if property.image_url %}
+                <img src="{{ property.image_url }}" class="card-img-top" alt="{{ property.name }}">
+                {% else %}
+                <img src="https://via.placeholder.com/300x200?text=Нет+изображения" class="card-img-top" alt="Нет изображения">
+                {% endif %}
+                <div class="card-body">
+                    <span class="badge badge-property-type mb-2">{{ property.property_type_display }}</span>
+                    <h5 class="card-title">{{ property.name }}</h5>
+                    <p class="property-address">{{ property.address }}</p>
+                    <div class="property-features">
+                        <span><i class="bi bi-rulers"></i> {{ property.area }} м²</span>
+                        {% if property.rooms > 0 %}
+                        <span><i class="bi bi-door-closed"></i> {{ property.rooms }} комн.</span>
+                        {% endif %}
+                        {% if property.floor %}
+                        <span><i class="bi bi-layers"></i> {{ property.floor }}/{{ property.total_floors }} эт.</span>
+                        {% endif %}
+                    </div>
+                    <h4 class="property-price mt-2">{{ property.price|floatformat:0 }} ₽</h4>
+                </div>
+                <div class="card-footer bg-white border-top-0">
+                    <div class="d-flex justify-content-between">
+                        <!-- Ссылка "Детали" -->
+                        <a href="{% url 'services:real-estate-detail-page' property.id %}">
+                            <i class="bi bi-info-circle"></i> Детали
+                        </a>
+                        
+                        <!-- Скрытая форма для отправки POST-запроса -->
+                        <form id="add-to-cart-form-{{ property.id }}" method="post" action="{% url 'services:add-property-to-order' property.id %}" style="display: none;">
+                            {% csrf_token %}
+                        </form>
+                        
+                        <!-- Ссылка "В корзину" с JavaScript для отправки формы -->
+                        <a href="javascript:void(0);" onclick="document.getElementById('add-to-cart-form-{{ property.id }}').submit();">
+                            <i class="bi bi-cart-plus"></i> В корзину
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="alert alert-info">
+        <h4 class="alert-heading">Объекты не найдены</h4>
+        <p>По вашему запросу не найдено объектов недвижимости. Попробуйте изменить параметры поиска.</p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

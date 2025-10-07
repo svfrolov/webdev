@@ -1,0 +1,83 @@
+{% extends 'services/base.html' %}
+
+{% block title %}{{ real_estate.name }} - Детали объекта{% endblock %}
+
+{% block content %}
+<div class="container">
+    <nav aria-label="breadcrumb" class="my-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'services:real-estate-list-page' %}">Каталог недвижимости</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{ real_estate.name }}</li>
+        </ol>
+    </nav>
+
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card mb-4">
+                {% if real_estate.image_url %}
+                <img src="{{ real_estate.image_url }}" class="img-fluid" alt="{{ real_estate.name }}">
+                {% else %}
+                <img src="https://via.placeholder.com/800x500?text=Нет+изображения" class="img-fluid" alt="Нет изображения">
+                {% endif %}
+                <div class="card-body">
+                    <span class="badge badge-property-type mb-2">{{ real_estate.property_type_display }}</span>
+                    <h2 class="card-title">{{ real_estate.name }}</h2>
+                    <p class="property-address">{{ real_estate.address }}</p>
+                    <h3 class="property-price mb-4">{{ real_estate.price|floatformat:0 }} ₽</h3>
+                    
+                    <div class="row mb-4">
+                        <div class="col-md-4">
+                            <h5>Площадь</h5>
+                            <p class="fs-4">{{ real_estate.area }} м²</p>
+                        </div>
+                        <div class="col-md-4">
+                            <h5>Комнаты</h5>
+                            <p class="fs-4">{{ real_estate.rooms }}</p>
+                        </div>
+                        <div class="col-md-4">
+                            <h5>Этаж</h5>
+                            <p class="fs-4">{% if real_estate.floor %}{{ real_estate.floor }}/{{ real_estate.total_floors }}{% else %}—{% endif %}</p>
+                        </div>
+                    </div>
+                    
+                    <h4 class="mb-3">Описание</h4>
+                    <p class="mb-4">{{ real_estate.description }}</p>
+                    
+                    <!-- Скрытая форма для отправки POST-запроса -->
+                    <form id="add-to-cart-form-detail" method="post" action="{% url 'services:add-property-to-order' real_estate.id %}" style="display: none;">
+                        {% csrf_token %}
+                    </form>
+                    
+                    <!-- Ссылка "Добавить в корзину" с JavaScript для отправки формы -->
+                    <a href="javascript:void(0);" onclick="document.getElementById('add-to-cart-form-detail').submit();">
+                        <i class="bi bi-cart-plus"></i> Добавить в корзину
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card sticky-top" style="top: 20px;">
+                <div class="card-body">
+                    <h4 class="mb-3">Контактная информация</h4>
+                    <p><i class="bi bi-telephone me-2"></i> +7 (999) 123-45-67</p>
+                    <p><i class="bi bi-envelope me-2"></i> info@realestate.ru</p>
+                    <hr>
+                    <h5>Расположение</h5>
+                    <p>{{ real_estate.address }}</p>
+                    
+                    {% if draft_order %}
+                    <div class="mt-4">
+                        <h5>Ваша корзина</h5>
+                        <p>Количество объектов: {{ draft_order.items|length }}</p>
+                        <a href="{% url 'services:order-detail-page' draft_order.id %}">
+                            <i class="bi bi-cart"></i> Перейти в корзину
+                        </a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
