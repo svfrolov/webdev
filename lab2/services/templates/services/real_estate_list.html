@@ -1,0 +1,57 @@
+{% extends 'services/base.html' %}
+
+{% block title %}Объекты недвижимости{% endblock %}
+
+{% block content %}
+<h1 class="mb-4">Объекты недвижимости</h1>
+
+<div class="row mb-4">
+    <div class="col-md-6">
+        <form method="get" action="{% url 'services:real-estate-list-page' %}" class="d-flex">
+            <input type="text" name="search" class="form-control me-2" placeholder="Поиск по названию" value="{{ search_query }}">
+            <button type="submit" class="btn btn-primary">Поиск</button>
+        </form>
+    </div>
+</div>
+
+<div class="row">
+    {% for property in real_estates %}
+    <div class="col-md-4 mb-4">
+        <div class="card h-100">
+            {% if property.get_image_url %}
+            <img src="{{ property.get_image_url }}" class="card-img-top" alt="{{ property.name }}">
+            {% else %}
+            <div class="card-img-top bg-light text-center py-5">Нет изображения</div>
+            {% endif %}
+            <div class="card-body">
+                <h5 class="card-title">{{ property.name }}</h5>
+                <p class="card-text text-truncate">{{ property.address }}</p>
+                <p class="card-text">
+                    <strong>Цена:</strong> {{ property.price|floatformat:2 }} ₽<br>
+                    <strong>Площадь:</strong> {{ property.area }} м²<br>
+                    <strong>Тип:</strong> {{ property.get_property_type_display }}
+                </p>
+                <div class="d-flex justify-content-between">
+                    <a href="{% url 'services:real-estate-detail-page' property_id=property.id %}" class="btn btn-outline-primary">Подробнее</a>
+                    {% if user.is_authenticated %}
+                    <form method="post" action="{% url 'services:add-property-to-order' property_id=property.id %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-primary">В заявку</button>
+                    </form>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    {% empty %}
+    <div class="col-12">
+        <div class="alert alert-info">
+            Объекты недвижимости не найдены.
+            {% if search_query %}
+            <a href="{% url 'services:real-estate-list-page' %}">Сбросить поиск</a>
+            {% endif %}
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

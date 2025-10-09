@@ -1,0 +1,78 @@
+{% extends 'services/base.html' %}
+
+{% block title %}{{ real_estate.name }}{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8">
+        <h1 class="mb-4">{{ real_estate.name }}</h1>
+        
+        <div class="mb-4">
+            {% if real_estate.get_image_url %}
+            <img src="{{ real_estate.get_image_url }}" class="img-fluid rounded" alt="{{ real_estate.name }}">
+            {% else %}
+            <div class="bg-light text-center py-5 rounded">Нет изображения</div>
+            {% endif %}
+        </div>
+        
+        <div class="card mb-4">
+            <div class="card-body">
+                <h5 class="card-title">Описание</h5>
+                <p class="card-text">{{ real_estate.description }}</p>
+            </div>
+        </div>
+        
+        <div class="card mb-4">
+            <div class="card-body">
+                <h5 class="card-title">Характеристики</h5>
+                <table class="table table-borderless">
+                    <tbody>
+                        <tr>
+                            <th scope="row">Адрес:</th>
+                            <td>{{ real_estate.address }}</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Площадь:</th>
+                            <td>{{ real_estate.area }} м²</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Тип недвижимости:</th>
+                            <td>{{ real_estate.get_property_type_display }}</td>
+                        </tr>
+                        {% if real_estate.rooms > 0 %}
+                        <tr>
+                            <th scope="row">Количество комнат:</th>
+                            <td>{{ real_estate.rooms }}</td>
+                        </tr>
+                        {% endif %}
+                        {% if real_estate.floor %}
+                        <tr>
+                            <th scope="row">Этаж:</th>
+                            <td>{{ real_estate.floor }} из {{ real_estate.total_floors }}</td>
+                        </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card sticky-top" style="top: 20px">
+            <div class="card-body">
+                <h5 class="card-title">Цена</h5>
+                <p class="card-text fs-3 fw-bold">{{ real_estate.price|floatformat:2 }} ₽</p>
+                
+                {% if user.is_authenticated %}
+                <form method="post" action="{% url 'services:add-property-to-order' property_id=real_estate.id %}" class="mb-3">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-primary w-100">Добавить в заявку</button>
+                </form>
+                {% endif %}
+                
+                <a href="{% url 'services:real-estate-list-page' %}" class="btn btn-outline-secondary w-100">Назад к списку</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

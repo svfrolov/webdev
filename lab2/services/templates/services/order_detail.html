@@ -1,0 +1,180 @@
+{% extends 'services/base.html' %}
+
+{% block title %}Заявка #{{ order.id }}{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>Заявка #{{ order.id }}</h1>
+    <span class="badge bg-{{ order.status|default:'draft'|yesno:'primary,danger,success,warning,secondary' }}">
+        {{ order.get_status_display }}
+    </span>
+</div>
+
+{% if order.status == 'draft' %}
+<div class="alert alert-info mb-4">
+    Это черновик заявки. Заполните все необходимые данные и добавьте объекты недвижимости, чтобы сформировать заявку.
+</div>
+{% endif %}
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">Объекты недвижимости в заявке</h5>
+            </div>
+            <div class="card-body">
+                {% if order_properties %}
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Наименование</th>
+                                <th>Количество</th>
+                                <th>Цена</th>
+                                <th>Скидка</th>
+                                <th>Итого</th>
+                                {% if order.status == 'draft' %}
+                                <th>Действия</th>
+                                {% endif %}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in order_properties %}
+                            <tr>
+                                <td>{{ item.order_number }}</td>
+                                <td>
+                                    <a href="{% url 'services:real-estate-detail-page' property_id=item.real_estate.id %}">
+                                        {{ item.real_estate.name }}
+                                    </a>
+                                    {% if item.is_main %}
+                                    <span class="badge bg-primary ms-1">Основной</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ item.quantity }}</td>
+                                <td>{{ item.real_estate.price|floatformat:2 }} ₽</td>
+                                <td>{{ item.discount_percent }}%</td>
+                                <td>{{ item.final_price|floatformat:2 }} ₽</td>
+                                {% if order.status == 'draft' %}
+                                <td>
+                                    <form method="post" action="{% url 'services:remove-property-from-order' order_id=order.id item_id=item.id %}">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-sm btn-danger">Удалить</button>
+                                    </form>
+                                </td>
+                                {% endif %}
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="alert alert-warning">
+                    В заявке нет объектов недвижимости.
+                    <a href="{% url 'services:real-estate-list-page' %}">Добавить объекты</a>
+                </div>
+                {% endif %}
+            </div>
+            <div class="card-footer text-end">
+                <strong>Итоговая стоимость: {{ total_price|floatformat:2 }} ₽</strong>
+                {% if order.payment_method == 'cash' %}
+                <div class="text-success">Скидка 5% при оплате наличными</div>
+                {% elif order.payment_method == 'mortgage' %}
+                <div class="text-success">Скидка 2% при ипотеке</div>
+                {% endif %}
+            </div>
+        </div>
+        
+        {% if order.status == 'draft' and order_properties %}
+        <div class="d-flex justify-content-between mb-4">
+            <a href="{% url 'services:real-estate-list-page' %}" class="btn btn-outline-primary">Добавить еще объекты</a>
+            <form method="post" action="{% url 'services:delete-order' order_id=order.id %}">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-danger" onclick="return confirm('Вы уверены, что хотите удалить эту заявку?')">
+                    Удалить заявку
+                </button>
+            </form>
+        </div>
+        {% endif %}
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">Информация о заявке</h5>
+            </div>
+            <div class="card-body">
+                <table class="table table-borderless">
+                    <tbody>
+                        <tr>
+                            <th scope="row">Дата создания:</th>
+                            <td>{{ order.created_at|date:"d.m.Y H:i" }}</td>
+                        </tr>
+                        {% if order.formed_at %}
+                        <tr>
+                            <th scope="row">Дата формирования:</th>
+                            <td>{{ order.formed_at|date:"d.m.Y H:i" }}</td>
+                        </tr>
+                        {% endif %}
+                        {% if order.completed_at %}
+                        <tr>
+                            <th scope="row">Дата завершения:</th>
+                            <td>{{ order.completed_at|date:"d.m.Y H:i" }}</td>
+                        </tr>
+                        {% endif %}
+                        <tr>
+                            <th scope="row">Создатель:</th>
+                            <td>{{ order.creator.username }}</td>
+                        </tr>
+                        {% if order.moderator %}
+                        <tr>
+                            <th scope="row">Модератор:</th>
+                            <td>{{ order.moderator.username }}</td>
+                        </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">Информация о клиенте</h5>
+            </div>
+            <div class="card-body">
+                <table class="table table-borderless">
+                    <tbody>
+                        <tr>
+                            <th scope="row">ФИО:</th>
+                            <td>{{ order.client_name|default:"Не указано" }}</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Телефон:</th>
+                            <td>{{ order.client_phone|default:"Не указано" }}</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Email:</th>
+                            <td>{{ order.client_email|default:"Не указано" }}</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Способ оплаты:</th>
+                            <td>{{ order.get_payment_method_display|default:"Не указано" }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        {% if order.estimated_delivery_date %}
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">Доставка документов</h5>
+            </div>
+            <div class="card-body">
+                <p>Предполагаемая дата доставки: <strong>{{ order.estimated_delivery_date|date:"d.m.Y" }}</strong></p>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
